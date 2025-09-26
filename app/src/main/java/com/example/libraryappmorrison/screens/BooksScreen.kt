@@ -52,7 +52,7 @@ fun BooksScreen(navController : NavController){
         items(books) { book ->
             Row(modifier = Modifier
                 .fillMaxWidth()
-                .clickable{navController.navigate("books/${book.id}")},
+                .clickable{navController.navigate(BookDetailScreenRoute(book.id))},
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SubcomposeAsyncImage(

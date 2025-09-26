@@ -26,9 +26,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.libraryappmorrison.screens.BookDetailScreen
+import com.example.libraryappmorrison.screens.BookDetailScreenRoute
+import com.example.libraryappmorrison.screens.BookScreenRoute
 import com.example.libraryappmorrison.screens.BooksScreen
 import com.example.libraryappmorrison.screens.FavoriteScreen
+import com.example.libraryappmorrison.screens.FavoriteScreenRoute
 import com.example.libraryappmorrison.ui.theme.AccentYellow
 import com.example.libraryappmorrison.ui.theme.BackgroundLight
 import com.example.libraryappmorrison.ui.theme.BottomBarBackground
@@ -50,7 +54,13 @@ class MainActivity : ComponentActivity() {
                             ) {
 
                                 NavigationBarItem(false, onClick = {
-                                    navController.navigate("books")
+                                    navController.navigate(BookScreenRoute){
+                                        launchSingleTop = true
+                                        popUpTo(navController.graph.startDestinationId){
+                                            saveState = true
+                                        }
+                                        restoreState = true
+                                    }
                                 },
                                     icon = { Icon(
                                         imageVector = Icons.Default.Menu,
@@ -59,8 +69,13 @@ class MainActivity : ComponentActivity() {
                                         tint = AccentYellow
                                     ) })
                                 NavigationBarItem(false, onClick = {
-                                    navController.navigate("favorites",
-                                        )
+                                    navController.navigate(FavoriteScreenRoute){
+                                        launchSingleTop = true
+                                        popUpTo(navController.graph.startDestinationId){
+                                            saveState = true
+                                        }
+                                        restoreState = true
+                                    }
                                 },
                                     icon = { Icon(
                                         imageVector = Icons.Default.Favorite,
@@ -72,24 +87,28 @@ class MainActivity : ComponentActivity() {
                     ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = "home"
+                        startDestination = BookScreenRoute
                     ) {
-                        composable("books") {
+                        composable<BookScreenRoute> {
                             BooksScreen(navController = navController)
                         }
-                        composable("favorites") {
+                        composable<FavoriteScreenRoute> {
                             FavoriteScreen()
                         }
-                        composable(route = "books/{id}"
-                            , arguments = listOf(
-                                navArgument("id"){
-                                    type = NavType.IntType
-                                }
-                            )
-                        ){ backStackEntry ->
-                            val id = backStackEntry.arguments?.getInt("id") ?: 0
-                            BookDetailScreen(bookId = id)
+                        composable<BookDetailScreenRoute> { backstackEntry ->
+                            val arguments = backstackEntry.toRoute<BookDetailScreenRoute>()
+                            BookDetailScreen(bookId = arguments.id)
                         }
+//                        composable(route = "books/{id}"
+//                            , arguments = listOf(
+//                                navArgument("id"){
+//                                    type = NavType.IntType
+//                                }
+//                            )
+//                        ){ backStackEntry ->
+//                            val id = backStackEntry.arguments?.getInt("id") ?: 0
+//                            BookDetailScreen(bookId = id)
+//                        }
                     }
                 }
             }
